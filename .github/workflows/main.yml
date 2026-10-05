@@ -1,20 +1,23 @@
-name: Quick Workflow
+name: Onboarding Pipeline Test Workflow
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-  workflow_dispatch:  # lets you run it manually from the Actions tab
+    workflow_dispatch:
+
 
 jobs:
-  quick-check:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v4
+    OnboardingPipelineTest:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
 
-      - name: Say hello
-        run: echo "Hello from GitHub Actions!"
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '20'
 
-      - name: Show repo contents
-        run: ls -la
+            - name: Load values
+              run: echo "Loading customer values from .github/workflows/values.json"
+
+            - name: Run onboarding pipeline test
+              run: echo "Running onboarding pipeline test with customer values"
