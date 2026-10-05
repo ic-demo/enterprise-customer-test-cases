@@ -1,0 +1,63 @@
+name: Customer Login Risk Tests
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+    workflow_dispatch:
+        inputs:
+            fixture:
+                description: Customer fixture file to test against
+                required: false
+                default: test/fixtures/customers.json
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    login-risk-tests:
+        name: Login risk tests (Node ${{ matrix.node }})
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        strategy:
+            fail-fast: false
+            matrix:
+                node: [20, 22]
+        env:
+            CUSTOMER_FIXTURE: ${{ inputs.fixture || 'test/fixtures/customers.json' }}
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Node.js ${{ matrix.node }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node }}
+
+            - name: Check customer fixtures
+              run: |
+                  test -f "$CUSTOMER_FIXTURE" || { echo "::error::Fixture not found: $CUSTOMER_FIXTURE"; exit 1; }
+                  node -e "const c = require('./test/fixtures/load').loadCases(); console.log('Loaded ' + c.length + ' customer cases from ' + process.env.CUSTOMER_FIXTURE)"
+
+            - name: Run login and risk-scoring tests
+              run: |
+                  mkdir -p reports
+                  node --test \
+                    --test-reporter=spec --test-reporter-destination=stdout \
+                    --test-reporter=junit --test-reporter-destination=reports/junit.xml \
+                    test/*.test.js
+
+            - name: Publish risk summary
+              if: always()
+              run: node scripts/risk-report.js "$CUSTOMER_FIXTURE" >> "$GITHUB_STEP_SUMMARY"
+
+            - name: Upload test report
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: junit-report-node-${{ matrix.node }}
+                  path: reports/junit.xml
