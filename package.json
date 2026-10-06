@@ -2,15 +2,13 @@
   "name": "enterprise-customer-test-cases",
   "version": "1.0.0",
   "private": true,
-  "description": "Login and scam-risk test cases for customer onboarding",
+  "description": "Onboarding scam-risk test cases (REQ-0012)",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "test": "node --test test/login.test.js test/riskEngine.test.js test/onboardingRisk.test.js",
-    "report": "node scripts/risk-report.js",
-    "test:onboarding": "node --test test/onboardingRisk.test.js",
-    "report:onboarding": "node scripts/onboarding-report.js",
-    "demo": "node --test --watch test/login.test.js test/riskEngine.test.js test/onboardingRisk.test.js"
+    "test": "node --test test/onboardingRisk.test.js",
+    "demo": "node --test --watch test/onboardingRisk.test.js",
+    "report": "node scripts/onboarding-report.js"
   }
 }

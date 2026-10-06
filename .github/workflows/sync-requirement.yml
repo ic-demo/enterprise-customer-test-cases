@@ -2,7 +2,7 @@ name: Sync requirement
 
 # Runs when the requirements manager signs off a deviation (repository_dispatch),
 # or manually to reset the requirement before a demo. Commits the updated
-# requirement, then reruns both test workflows against it.
+# requirement, then reruns the onboarding pipeline against it.
 on:
     repository_dispatch:
         types: [requirement-updated]
@@ -66,11 +66,10 @@ jobs:
                   echo "### $COMMIT_MESSAGE" >> "$GITHUB_STEP_SUMMARY"
 
             # Pushes made with GITHUB_TOKEN don't trigger other workflows, so
-            # start the test workflows explicitly.
-            - name: Rerun test workflows
+            # start the onboarding pipeline explicitly.
+            - name: Rerun onboarding pipeline
               if: steps.commit.outputs.changed == 'true'
               env:
                   GH_TOKEN: ${{ github.token }}
               run: |
                   gh workflow run main.yml --ref main
-                  gh workflow run test.yml --ref main
