@@ -8,6 +8,8 @@
   },
   "scripts": {
     "test": "node --test test/*.test.js",
-    "report": "node scripts/risk-report.js"
+    "report": "node scripts/risk-report.js",
+    "test:onboarding": "node --test test/onboardingRisk.test.js",
+    "report:onboarding": "node scripts/onboarding-report.js"
   }
 }

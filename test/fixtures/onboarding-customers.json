@@ -1,0 +1,35 @@
+{
+  "_comment": "Synthetic onboarding customers only.",
+  "customers": [
+    {
+      "id": "ONB-2001", "name": "Priya Shah",
+      "description": "Working-age customer, confident online, regular activity: not high risk",
+      "age": 34, "digitalLiteracy": "HIGH", "accountActivity": "REGULAR",
+      "expected": { "status": "NOT_HIGH_RISK", "score": 0 }
+    },
+    {
+      "id": "ONB-2002", "name": "Walter Briggs",
+      "description": "Elderly customer with low digital literacy and a dormant account: high risk",
+      "age": 82, "digitalLiteracy": "LOW", "accountActivity": "DORMANT",
+      "expected": { "status": "HIGH_RISK", "score": 90 }
+    },
+    {
+      "id": "ONB-2003", "name": "Joan Pryce",
+      "description": "Score exactly at the high-risk threshold: high risk",
+      "age": 70, "digitalLiteracy": "MEDIUM", "accountActivity": "DORMANT",
+      "expected": { "status": "HIGH_RISK", "score": 60 }
+    },
+    {
+      "id": "ONB-2004", "name": "Sam Okafor",
+      "description": "Young adult with low digital literacy and low activity: below threshold",
+      "age": 19, "digitalLiteracy": "LOW", "accountActivity": "LOW",
+      "expected": { "status": "NOT_HIGH_RISK", "score": 50 }
+    },
+    {
+      "id": "ONB-2005", "name": "Edith Moss",
+      "description": "Digital literacy not captured at onboarding: unable to score",
+      "age": 77, "accountActivity": "REGULAR",
+      "expected": { "status": "UNABLE_TO_SCORE", "score": null }
+    }
+  ]
+}

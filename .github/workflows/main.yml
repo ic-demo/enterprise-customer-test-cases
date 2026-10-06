@@ -1,23 +1,56 @@
 name: Onboarding Pipeline Test Workflow
 
 on:
+    push:
+        branches: [main]
+    pull_request:
     workflow_dispatch:
+        inputs:
+            fixture:
+                description: Onboarding customer fixture to report on
+                required: false
+                default: test/fixtures/onboarding-customers.json
 
+permissions:
+    contents: read
 
 jobs:
     OnboardingPipelineTest:
         runs-on: ubuntu-latest
+        timeout-minutes: 10
+        env:
+            ONBOARDING_FIXTURE: ${{ inputs.fixture || 'test/fixtures/onboarding-customers.json' }}
         steps:
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Set up Node.js
-              uses: actions/setup-node@v3
+              uses: actions/setup-node@v4
               with:
-                  node-version: '20'
+                  node-version: '22'
 
-            - name: Load values
-              run: echo "Loading customer values from .github/workflows/values.json"
+            - name: Check onboarding fixture
+              run: |
+                  test -f "$ONBOARDING_FIXTURE" || { echo "::error::Fixture not found: $ONBOARDING_FIXTURE"; exit 1; }
+                  node -e "const f = require(require('path').resolve(process.env.ONBOARDING_FIXTURE)); console.log('Loaded ' + f.customers.length + ' onboarding customers from ' + process.env.ONBOARDING_FIXTURE)"
 
-            - name: Run onboarding pipeline test
-              run: echo "Running onboarding pipeline test with customer values"
+            # Tests age, digital literacy and account activity scoring (TC-1 to TC-3).
+            - name: Run onboarding scam-risk test cases
+              run: |
+                  mkdir -p reports
+                  node --test \
+                    --test-reporter=spec --test-reporter-destination=stdout \
+                    --test-reporter=./scripts/test-case-reporter.mjs --test-reporter-destination="$GITHUB_STEP_SUMMARY" \
+                    --test-reporter=junit --test-reporter-destination=reports/onboarding-junit.xml \
+                    test/onboardingRisk.test.js
+
+            - name: Publish onboarding risk report
+              if: always()
+              run: node scripts/onboarding-report.js "$ONBOARDING_FIXTURE" >> "$GITHUB_STEP_SUMMARY"
+
+            - name: Upload test report
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: onboarding-junit-report
+                  path: reports/onboarding-junit.xml
