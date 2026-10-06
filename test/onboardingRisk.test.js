@@ -1,14 +1,17 @@
 'use strict';
 
 // Onboarding scam-risk test cases. Test names start with "TC-<n>:" so the
-// test-case reporter can list them in the pipeline summary.
+// test-case reporter can list them in the pipeline summary. The expected flag
+// label comes from the requirement (requirements/scam-risk.json).
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { assessOnboardingRisk, screenCustomers, HIGH_RISK_THRESHOLD, STATUS } = require('../src/onboardingRisk');
+const { flagLabel, expectedOnboardingStatus } = require('../requirements/scamRisk');
 
 const { customers } = require(path.join(__dirname, 'fixtures', 'onboarding-customers.json'));
 const byId = (id) => customers.find((c) => c.id === id);
+const label = (status) => status.toLowerCase().replaceAll('_', ' ');
 
 test('TC-1: Score is assigned from age, digital literacy and account activity', () => {
   const customer = byId('ONB-2003');
@@ -28,15 +31,15 @@ test('TC-1: Score is assigned from age, digital literacy and account activity', 
   }
 });
 
-test('TC-2: Score exactly at the threshold → flagged "high risk"', () => {
+test(`TC-2: Score exactly at the threshold → flagged "${flagLabel}"`, () => {
   const result = assessOnboardingRisk(byId('ONB-2003'));
   assert.equal(result.score, HIGH_RISK_THRESHOLD, `fixture scored ${result.score}, not the threshold ${HIGH_RISK_THRESHOLD}`);
-  assert.equal(result.status, STATUS.HIGH_RISK, `flagged "${result.status}"`);
+  assert.equal(result.status, expectedOnboardingStatus, `flagged "${label(result.status)}"`);
   assert.equal(result.highRisk, true, 'highRisk flag not set');
 
   const below = assessOnboardingRisk(byId('ONB-2004'));
   assert.ok(below.score < HIGH_RISK_THRESHOLD);
-  assert.equal(below.status, STATUS.NOT_HIGH_RISK, `below threshold but flagged "${below.status}"`);
+  assert.equal(below.status, STATUS.NOT_HIGH_RISK, `below threshold but flagged "${label(below.status)}"`);
 });
 
 test('TC-3: Missing digital literacy → listed as unable to score, not left out', () => {
@@ -45,7 +48,7 @@ test('TC-3: Missing digital literacy → listed as unable to score, not left out
 
   assert.equal(results.length, customers.length, 'customers were dropped from the results');
   assert.ok(edith, 'customer missing digital literacy was left out');
-  assert.equal(edith.result.status, STATUS.UNABLE_TO_SCORE, `listed as "${edith.result.status}"`);
+  assert.equal(edith.result.status, STATUS.UNABLE_TO_SCORE, `listed as "${label(edith.result.status)}"`);
   assert.deepEqual(edith.result.missing, ['digitalLiteracy']);
   assert.equal(edith.result.score, null, 'a score was assigned despite missing data');
 });

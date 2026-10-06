@@ -1,23 +1,29 @@
 'use strict';
 
-// Prints a Markdown onboarding scam-risk report: the rules and threshold used,
-// every customer's score and high-risk flag, and any customer that could not
-// be scored.
+// Prints a Markdown onboarding scam-risk report: the requirement being tested,
+// the rules and threshold used, every customer's score and flag, and any
+// customer that could not be scored.
 const fs = require('node:fs');
 const path = require('node:path');
 const { screenCustomers, RULES, HIGH_RISK_THRESHOLD, STATUS } = require('../src/onboardingRisk');
+const { requirement, flagLabel, expectedOnboardingStatus, criterion } = require('../requirements/scamRisk');
 
 const file = process.argv[2] || path.join(__dirname, '..', 'test', 'fixtures', 'onboarding-customers.json');
 const results = screenCustomers(JSON.parse(fs.readFileSync(path.resolve(file), 'utf8')).customers);
 
-const FLAG = { HIGH_RISK: '🔴 Flagged high risk', NOT_HIGH_RISK: '🟢 Not flagged', UNABLE_TO_SCORE: '⚠️ Unable to score' };
+const FLAG = { HIGH_RISK: '🔴 Flagged high risk', VERY_HIGH_RISK: '🔴 Flagged very high risk', NOT_HIGH_RISK: '🟢 Not flagged', UNABLE_TO_SCORE: '⚠️ Unable to score' };
 const count = (status) => results.filter((c) => c.result.status === status).length;
 
+// expected.flagged: true = flagged with the requirement's label, null = unable to score.
+const expectedStatus = ({ flagged }) =>
+  flagged === null ? STATUS.UNABLE_TO_SCORE : flagged ? expectedOnboardingStatus : STATUS.NOT_HIGH_RISK;
+
 console.log('## Onboarding scam-risk report\n');
-console.log(`${FLAG.HIGH_RISK}: ${count(STATUS.HIGH_RISK)} · ${FLAG.NOT_HIGH_RISK}: ${count(STATUS.NOT_HIGH_RISK)} · ${FLAG.UNABLE_TO_SCORE}: ${count(STATUS.UNABLE_TO_SCORE)}\n`);
+console.log(`> **${requirement.reference} AC-2:** ${criterion('AC-2')}\n`);
+console.log(Object.values(STATUS).filter(count).map((s) => `${FLAG[s]}: ${count(s)}`).join(' · ') + '\n');
 
 console.log('### Rules and threshold\n');
-console.log(`A customer whose score is **${HIGH_RISK_THRESHOLD} or more** is flagged as high risk.\n`);
+console.log(`A customer whose score is **${HIGH_RISK_THRESHOLD} or more** is flagged as ${flagLabel}.\n`);
 console.log('| Attribute | Rule | Points |');
 console.log('|---|---|---|');
 for (const { attribute, rule, points } of RULES) console.log(`| ${attribute} | ${rule} | ${points} |`);
@@ -26,7 +32,7 @@ console.log('\n### Customers\n');
 console.log('| Customer | Age | Digital literacy | Account activity | Score | Flagged | Matches expected |');
 console.log('|---|---|---|---|---|---|---|');
 for (const { id, name, age, digitalLiteracy, accountActivity, result, expected } of results) {
-  const matches = result.status === expected?.status && result.score === expected?.score;
+  const matches = expected && result.status === expectedStatus(expected) && result.score === expected.score;
   console.log(`| ${id} ${name} | ${age ?? '–'} | ${digitalLiteracy ?? '–'} | ${accountActivity ?? '–'} | ${result.score ?? '–'} | ${FLAG[result.status]} | ${expected ? (matches ? '✅' : '❌') : '–'} |`);
 }
 

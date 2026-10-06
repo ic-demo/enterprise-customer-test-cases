@@ -20,7 +20,9 @@ const THRESHOLDS = { MEDIUM: 30, HIGH: 60 };
 const MAX_SCORE = 100;
 
 function riskLevel(score) {
-  if (score >= THRESHOLDS.HIGH) return 'HIGH';
+  // DEMO DEVIATION: scores at or above the high threshold are labelled
+  // VERY_HIGH instead of HIGH. Change back to 'HIGH' to fix.
+  if (score >= THRESHOLDS.HIGH) return 'VERY_HIGH';
   if (score >= THRESHOLDS.MEDIUM) return 'MEDIUM';
   return 'LOW';
 }

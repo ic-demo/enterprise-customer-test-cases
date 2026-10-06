@@ -3,6 +3,7 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 const { assessRisk, riskLevel, THRESHOLDS } = require('../src/riskEngine');
+const { expectedRiskLevel } = require('../requirements/scamRisk');
 
 const baseCustomer = {
   age: 40, accountAgeDays: 1000, failedAttempts: 0, homeCountry: 'GB', knownDevices: ['dev-1'],
@@ -50,6 +51,6 @@ describe('Risk levels', () => {
     assert.equal(riskLevel(THRESHOLDS.MEDIUM - 1), 'LOW');
     assert.equal(riskLevel(THRESHOLDS.MEDIUM), 'MEDIUM');
     assert.equal(riskLevel(THRESHOLDS.HIGH - 1), 'MEDIUM');
-    assert.equal(riskLevel(THRESHOLDS.HIGH), 'HIGH');
+    assert.equal(riskLevel(THRESHOLDS.HIGH), expectedRiskLevel);
   });
 });

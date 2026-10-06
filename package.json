@@ -7,9 +7,10 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node --test test/*.test.js",
+    "test": "node --test test/login.test.js test/riskEngine.test.js test/onboardingRisk.test.js",
     "report": "node scripts/risk-report.js",
     "test:onboarding": "node --test test/onboardingRisk.test.js",
-    "report:onboarding": "node scripts/onboarding-report.js"
+    "report:onboarding": "node scripts/onboarding-report.js",
+    "demo": "node --test --watch test/login.test.js test/riskEngine.test.js test/onboardingRisk.test.js"
   }
 }

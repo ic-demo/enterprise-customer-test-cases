@@ -1,5 +1,5 @@
 {
-  "_comment": "Synthetic customers only. Every customer's demo password is 'Demo-Passw0rd!'.",
+  "_comment": "Synthetic customers only. Every customer's demo password is 'Demo-Passw0rd!'. expected.level FLAGGED = the level for the requirement's flagLabel (requirements/scam-risk.json).",
   "cases": [
     {
       "id": "CUST-1001",
@@ -21,7 +21,7 @@
         "credential": { "salt": "cca7f5018fa776dafda55f6a53b68008", "hash": "4f683ed13f93a7d364f3e6fd25d1c20840ad6fab39c1a90ab6e7b1cf344e02d3" }
       },
       "attempt": { "password": "Demo-Passw0rd!", "session": { "deviceId": "dev-b1", "country": "GB", "onActiveCall": true, "hoursSinceNewPayee": 2 } },
-      "expected": { "outcome": "RESTRICTED", "score": 75, "level": "HIGH", "flags": ["ELDERLY_CUSTOMER", "NEW_PAYEE_ADDED", "ACTIVE_PHONE_CALL"] }
+      "expected": { "outcome": "RESTRICTED", "score": 75, "level": "FLAGGED", "flags": ["ELDERLY_CUSTOMER", "NEW_PAYEE_ADDED", "ACTIVE_PHONE_CALL"] }
     },
     {
       "id": "CUST-1003",
@@ -65,7 +65,7 @@
         "credential": { "salt": "f9f677a219c3a7e7b985ced4cb6d212a", "hash": "0226e5642f998459971a1a73a85c8cca6ceb10e0c10f7d77ab1b89bb0bfcfe11" }
       },
       "attempt": { "password": "Demo-Passw0rd!", "session": { "deviceId": "dev-f1", "country": "GB", "onActiveCall": true, "remoteAccessDetected": true, "hoursSinceNewPayee": 5 } },
-      "expected": { "outcome": "RESTRICTED", "score": 70, "level": "HIGH", "flags": ["NEW_PAYEE_ADDED", "ACTIVE_PHONE_CALL", "REMOTE_ACCESS_TOOL"] }
+      "expected": { "outcome": "RESTRICTED", "score": 70, "level": "FLAGGED", "flags": ["NEW_PAYEE_ADDED", "ACTIVE_PHONE_CALL", "REMOTE_ACCESS_TOOL"] }
     },
     {
       "id": "CUST-1007",
@@ -76,7 +76,7 @@
         "credential": { "salt": "b2ee3a5e24e68cef4f94e505bb00b28c", "hash": "68abbd9cf66103ef3414a9efddddbddf695394d234720d15a4fc8e6f3da5e1a0" }
       },
       "attempt": { "password": "Demo-Passw0rd!", "session": { "deviceId": "dev-x7", "country": "RO", "hoursSincePasswordReset": 3 } },
-      "expected": { "outcome": "RESTRICTED", "score": 65, "level": "HIGH", "flags": ["RECENT_FAILED_ATTEMPTS", "UNRECOGNISED_DEVICE", "FOREIGN_LOGIN", "RECENT_PASSWORD_RESET"] }
+      "expected": { "outcome": "RESTRICTED", "score": 65, "level": "FLAGGED", "flags": ["RECENT_FAILED_ATTEMPTS", "UNRECOGNISED_DEVICE", "FOREIGN_LOGIN", "RECENT_PASSWORD_RESET"] }
     },
     {
       "id": "CUST-1008",
@@ -87,7 +87,7 @@
         "credential": { "salt": "cca7f5018fa776dafda55f6a53b68008", "hash": "4f683ed13f93a7d364f3e6fd25d1c20840ad6fab39c1a90ab6e7b1cf344e02d3" }
       },
       "attempt": { "password": "Demo-Passw0rd!", "session": { "deviceId": "dev-z0", "country": "NG", "onActiveCall": true, "remoteAccessDetected": true, "hoursSincePasswordReset": 1, "hoursSinceNewPayee": 1 } },
-      "expected": { "outcome": "RESTRICTED", "score": 100, "level": "HIGH", "flags": ["ELDERLY_CUSTOMER", "RECENT_FAILED_ATTEMPTS", "UNRECOGNISED_DEVICE", "FOREIGN_LOGIN", "RECENT_PASSWORD_RESET", "NEW_PAYEE_ADDED", "ACTIVE_PHONE_CALL", "REMOTE_ACCESS_TOOL"] }
+      "expected": { "outcome": "RESTRICTED", "score": 100, "level": "FLAGGED", "flags": ["ELDERLY_CUSTOMER", "RECENT_FAILED_ATTEMPTS", "UNRECOGNISED_DEVICE", "FOREIGN_LOGIN", "RECENT_PASSWORD_RESET", "NEW_PAYEE_ADDED", "ACTIVE_PHONE_CALL", "REMOTE_ACCESS_TOOL"] }
     },
     {
       "id": "CUST-1009",

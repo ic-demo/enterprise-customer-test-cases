@@ -10,6 +10,7 @@ const OUTCOME_BY_RISK = {
   LOW: 'ALLOW',
   MEDIUM: 'STEP_UP_MFA',
   HIGH: 'RESTRICTED', // signed in, but outbound payments held for fraud review
+  VERY_HIGH: 'RESTRICTED',
 };
 
 function verifyPassword(password, { salt, hash }) {

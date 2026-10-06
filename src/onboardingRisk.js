@@ -23,7 +23,7 @@ const RULES = [
 
 const HIGH_RISK_THRESHOLD = 60;
 
-const STATUS = { HIGH_RISK: 'HIGH_RISK', NOT_HIGH_RISK: 'NOT_HIGH_RISK', UNABLE_TO_SCORE: 'UNABLE_TO_SCORE' };
+const STATUS = { HIGH_RISK: 'HIGH_RISK', VERY_HIGH_RISK: 'VERY_HIGH_RISK', NOT_HIGH_RISK: 'NOT_HIGH_RISK', UNABLE_TO_SCORE: 'UNABLE_TO_SCORE' };
 
 const isMissing = (value) => value === undefined || value === null || value === '';
 
@@ -43,7 +43,9 @@ function assessOnboardingRisk(customer) {
   const score = rulesApplied.reduce((sum, r) => sum + r.points, 0);
   const highRisk = score >= HIGH_RISK_THRESHOLD;
   return {
-    status: highRisk ? STATUS.HIGH_RISK : STATUS.NOT_HIGH_RISK,
+    // DEMO DEVIATION: flagged customers are labelled VERY_HIGH_RISK instead of
+    // HIGH_RISK, so TC-2 fails. Change back to STATUS.HIGH_RISK to fix.
+    status: highRisk ? STATUS.VERY_HIGH_RISK : STATUS.NOT_HIGH_RISK,
     score, highRisk, rulesApplied, missing: [], invalid: [],
   };
 }

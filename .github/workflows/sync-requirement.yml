@@ -1,0 +1,76 @@
+name: Sync requirement
+
+# Runs when the requirements manager signs off a deviation (repository_dispatch),
+# or manually to reset the requirement before a demo. Commits the updated
+# requirement, then reruns both test workflows against it.
+on:
+    repository_dispatch:
+        types: [requirement-updated]
+    workflow_dispatch:
+        inputs:
+            reset:
+                description: Reset REQ-0012 to the original requirement ("high risk")
+                type: boolean
+                default: true
+
+permissions:
+    contents: write
+    actions: write
+
+concurrency:
+    group: sync-requirement
+
+jobs:
+    sync:
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  ref: main
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '22'
+
+            - name: Update requirement
+              id: update
+              env:
+                  REQUIREMENT_PAYLOAD: ${{ toJson(github.event.client_payload) }}
+                  RESET: ${{ github.event_name == 'workflow_dispatch' && inputs.reset }}
+              run: |
+                  if [ "$RESET" = "true" ]; then
+                    node scripts/sync-requirement.js --reset
+                  else
+                    node scripts/sync-requirement.js
+                  fi
+
+            - name: Commit requirement
+              id: commit
+              env:
+                  COMMIT_MESSAGE: ${{ steps.update.outputs.commit_message }}
+              run: |
+                  git add requirements/scam-risk.json
+                  if git diff --cached --quiet; then
+                    echo "Requirement unchanged, nothing to commit."
+                    echo "changed=false" >> "$GITHUB_OUTPUT"
+                    exit 0
+                  fi
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git commit -m "$COMMIT_MESSAGE"
+                  git push origin HEAD:main
+                  echo "changed=true" >> "$GITHUB_OUTPUT"
+                  echo "### $COMMIT_MESSAGE" >> "$GITHUB_STEP_SUMMARY"
+
+            # Pushes made with GITHUB_TOKEN don't trigger other workflows, so
+            # start the test workflows explicitly.
+            - name: Rerun test workflows
+              if: steps.commit.outputs.changed == 'true'
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  gh workflow run main.yml --ref main
+                  gh workflow run test.yml --ref main
