@@ -1,21 +1,26 @@
 'use strict';
 
-// Prints a Markdown summary of every fixture's login outcome, for the
-// GitHub Actions job summary.
-const { login } = require('../src/login');
+// Prints a Markdown summary of whether each fixture customer is flagged as
+// high scam risk, for the GitHub Actions job summary.
+const { assessRisk, THRESHOLDS } = require('../src/riskEngine');
 const { loadCases } = require('../test/fixtures/load');
 
-const BADGE = { ALLOW: '🟢', STEP_UP_MFA: '🟡', RESTRICTED: '🔴', DENIED: '⛔', LOCKED: '🔒' };
+const FLAG = { true: '🔴 Flagged high risk', false: '🟢 Not flagged' };
 
-const results = loadCases(process.argv[2]).map((c) => ({ ...c, ...login(c.customer, c.attempt) }));
+const results = loadCases(process.argv[2]).map((c) => {
+  const risk = assessRisk(c.customer, c.attempt.session);
+  const expectedFlag = c.expected.level === undefined ? undefined : c.expected.level === 'HIGH';
+  return { ...c, risk, flagged: risk.level === 'HIGH', expectedFlag };
+});
 
-const counts = {};
-for (const { outcome } of results) counts[outcome] = (counts[outcome] || 0) + 1;
+const flaggedCount = results.filter((r) => r.flagged).length;
 
-console.log('## Login risk screening results\n');
-console.log(Object.entries(counts).map(([o, n]) => `${BADGE[o]} **${o}**: ${n}`).join(' · ') + '\n');
-console.log('| Customer | Age | Risk score | Outcome | Flags | Matches expected |');
+console.log('## Scam-risk flagging results\n');
+console.log(`A customer whose risk score is **${THRESHOLDS.HIGH} or more** is flagged as high risk.\n`);
+console.log(`${FLAG.true}: ${flaggedCount} · ${FLAG.false}: ${results.length - flaggedCount}\n`);
+console.log('| Customer | Age | Risk score | Flagged | Rules triggered | Matches expected |');
 console.log('|---|---|---|---|---|---|');
-for (const { id, customer, outcome, risk, expected } of results) {
-  console.log(`| ${id} | ${customer.age} | ${risk ? `${risk.score} (${risk.level})` : '–'} | ${BADGE[outcome]} ${outcome} | ${risk?.flags.join(', ') || '–'} | ${outcome === expected.outcome ? '✅' : '❌'} |`);
+for (const { id, customer, risk, flagged, expectedFlag } of results) {
+  const matches = expectedFlag === undefined ? '–' : flagged === expectedFlag ? '✅' : '❌';
+  console.log(`| ${id} | ${customer.age} | ${risk.score} | ${FLAG[flagged]} | ${risk.flags.join(', ') || '–'} | ${matches} |`);
 }

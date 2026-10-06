@@ -10,7 +10,7 @@ const { screenCustomers, RULES, HIGH_RISK_THRESHOLD, STATUS } = require('../src/
 const file = process.argv[2] || path.join(__dirname, '..', 'test', 'fixtures', 'onboarding-customers.json');
 const results = screenCustomers(JSON.parse(fs.readFileSync(path.resolve(file), 'utf8')).customers);
 
-const FLAG = { HIGH_RISK: '🔴 HIGH RISK', NOT_HIGH_RISK: '🟢 Not high risk', UNABLE_TO_SCORE: '⚠️ Unable to score' };
+const FLAG = { HIGH_RISK: '🔴 Flagged high risk', NOT_HIGH_RISK: '🟢 Not flagged', UNABLE_TO_SCORE: '⚠️ Unable to score' };
 const count = (status) => results.filter((c) => c.result.status === status).length;
 
 console.log('## Onboarding scam-risk report\n');
@@ -23,7 +23,7 @@ console.log('|---|---|---|');
 for (const { attribute, rule, points } of RULES) console.log(`| ${attribute} | ${rule} | ${points} |`);
 
 console.log('\n### Customers\n');
-console.log('| Customer | Age | Digital literacy | Account activity | Score | Flag | Matches expected |');
+console.log('| Customer | Age | Digital literacy | Account activity | Score | Flagged | Matches expected |');
 console.log('|---|---|---|---|---|---|---|');
 for (const { id, name, age, digitalLiteracy, accountActivity, result, expected } of results) {
   const matches = result.status === expected?.status && result.score === expected?.score;
