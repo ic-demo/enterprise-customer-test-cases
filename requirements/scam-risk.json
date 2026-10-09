@@ -2,33 +2,13 @@
   "_comment": "Source of truth for what the tests expect. Updated automatically when a deviation on this requirement is signed off in the requirements manager. scam-risk.baseline.json is the original requirement, restored by the 'Sync requirement' workflow's reset.",
   "reference": "REQ-0012",
   "title": "Flag customers at high scam risk from onboarding attributes",
-  "flagLabel": "very high risk",
+  "flagLabel": "high risk",
   "acceptanceCriteria": [
-    {
-      "ref": "AC-1",
-      "text": "Each customer is assigned a scam-risk score using predefined rules based on age, digital literacy, and account activity."
-    },
-    {
-      "ref": "AC-2",
-      "text": "A customer whose score meets or exceeds the defined threshold is flagged as 'very high risk'."
-    },
-    {
-      "ref": "AC-3",
-      "text": "The 'very high risk' flag is written to continuously-updated customer reports, with each customer's details accessible in the system."
-    },
-    {
-      "ref": "AC-4",
-      "text": "The rules and threshold used to determine very high risk are documented and recorded alongside the watchlist."
-    },
-    {
-      "ref": "AC-5",
-      "text": "A customer missing attributes needed for scoring is identified rather than silently omitted."
-    }
+    { "ref": "AC-1", "text": "Each customer is assigned a scam-risk score using predefined rules based on age, digital literacy, and account activity." },
+    { "ref": "AC-2", "text": "A customer whose score meets or exceeds the defined threshold is flagged as high risk." },
+    { "ref": "AC-3", "text": "The high-risk flag is displayed against the relevant customer in reports." },
+    { "ref": "AC-4", "text": "The rules and threshold used to determine high risk are documented and stated in the report." },
+    { "ref": "AC-5", "text": "A customer missing attributes needed for scoring is identified rather than silently omitted." }
   ],
-  "lastChange": {
-    "summary": "Deviation on MR !22 signed off by M. Okafor (Product Owner)",
-    "mrNumber": 22,
-    "actor": "M. Okafor (Product Owner)",
-    "at": "2026-10-06T22:42:07.826Z"
-  }
+  "lastChange": null
 }
